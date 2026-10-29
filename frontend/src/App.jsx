@@ -324,20 +324,16 @@ function CustomerAssistantWidget() {
 
 function AuthPage({ mode }) {
   const signup = mode === "signup";
-  const [form, setForm] = useState({
-    name: "", category: "Retail", owner: "", website: "", phone: "", address: "", hours: "",
-    description: "", currency: "PKR", timezone: "Asia/Karachi", support: "", email: "", password: "",
-  });
+  const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const update = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   async function submit(e) {
     e.preventDefault(); setBusy(true); setError("");
     try {
       const data = await api(signup ? "/auth/signup" : "/auth/login", {
         method: "POST",
-        body: json(signup ? form : { email: form.email, password: form.password }),
+        body: json({ name: name.trim() }),
       });
       localStorage.setItem(TOKEN_KEY, data.token);
       navigate("dashboard");
@@ -349,14 +345,11 @@ function AuthPage({ mode }) {
     <aside className="bn-auth-aside"><Brand /><div className="bn-auth-promo"><span className="bn-eyebrow">MEET YOUR BUSINESS ASSISTANT</span><h1>Less busywork.<br /><em>More possibility.</em></h1><p>One place to manage your business information and give customers a helpful AI experience.</p><div className="bn-auth-quote"><span>✦</span><p>“A better customer experience starts with a conversation.”</p></div></div><small className="bn-auth-foot">Rides AI · AI for every business</small></aside>
     <main className="bn-auth-main"><button className="bn-back-link" onClick={() => navigate("")}>← Back to home</button>
       <form className="bn-auth-form" onSubmit={submit}><span className="bn-eyebrow">{signup ? "START YOUR WORKSPACE" : "WELCOME BACK"}</span>
-        <h2>{signup ? "Create your business" : "Log in to Rides AI"}</h2><p>{signup ? "Set up your workspace to launch your AI assistant." : "Enter your account details to continue."}</p>
+        <h2>{signup ? "Create your business" : "Log in to Rides AI"}</h2>
+        <p>{signup ? "Enter your business name to launch your AI assistant. Currency PKR and timezone Asia/Karachi are set by default." : "Enter your business name to continue."}</p>
         <ErrorMessage>{error}</ErrorMessage>
-        {signup && <>
-          <label>Business name<input required name="name" value={form.name} onChange={update} placeholder="e.g. The Little Studio" maxLength={100} /></label>
-          <div className="bn-form-row"><label>Currency<select name="currency" value={form.currency} onChange={update}><option>PKR</option><option>USD</option><option>GBP</option><option>EUR</option><option>AED</option></select></label><label>Timezone<select name="timezone" value={form.timezone} onChange={update}><option>Asia/Karachi</option><option>Asia/Dubai</option><option>Europe/London</option><option>America/New_York</option><option>UTC</option></select></label></div>
-        </>}
-        {!signup &&           <label>Business name<input required name="name" value={form.name} onChange={update} placeholder="e.g. The Little Studio" maxLength={100} /></label>}
-        <button className="bn-btn bn-btn-primary bn-btn-full bn-btn-lg" disabled={busy}>{busy ? "Please wait..." : signup ? "Create workspace →" : "Log in →"}</button>
+        <label>Business name<input required value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. The Little Studio" maxLength={100} autoFocus /></label>
+        <button className="bn-btn bn-btn-primary bn-btn-full bn-btn-lg" disabled={busy || !name.trim()}>{busy ? "Please wait..." : signup ? "Create workspace →" : "Log in →"}</button>
         <p className="bn-auth-switch">{signup ? "Already have an account?" : "New to Rides AI?"} <button type="button" onClick={() => navigate(signup ? "login" : "signup")}>{signup ? "Log in" : "Create a business"}</button></p>
       </form>
     </main>
@@ -1080,7 +1073,7 @@ function DataTable({ title, description, columns, rows }) {
 }
 
 function dateText(value) {
-  if (!value) return "—";
+  if (!value) return "—"; 
   const date = new Date(Number(value) * 1000);
   return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 }
