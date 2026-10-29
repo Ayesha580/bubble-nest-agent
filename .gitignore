@@ -1,0 +1,9 @@
+.env
+.env.*
+*.db
+venv/
+.venv/
+__pycache__/
+node_modules/
+dist/
+.idea/
