@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
-import logo from "./assets/logo.png";
+import logo from "./assets/logo.webp";
 
 const API = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
 const TOKEN_KEY = "bn_token";
@@ -80,10 +80,10 @@ function Brand({ compact = false }) {
     <button
       className={`bn-brand ${compact ? "bn-brand-compact" : ""}`}
       onClick={() => navigate("/")}
-      aria-label="Bubble Nest home"
+      aria-label="Rides AI home"
     >
       <img src={logo} alt="" className="bn-brand-logo" />
-      <span>BNT</span>
+      <span>Rides Ai</span>
     </button>
   );
 }
@@ -176,7 +176,7 @@ function HomePage() {
 
       <footer className="bn-footer">
         <Brand compact />
-        <span>© {new Date().getFullYear()} Bubble Nest Technologies. Built for better conversations.</span>
+        <span>© {new Date().getFullYear()} Rides AI. Built for better conversations.</span>
         <button onClick={() => navigate("login")}>Business login</button>
       </footer>
 
@@ -244,7 +244,7 @@ function CustomerAssistantWidget() {
           <header className="bn-customer-header">
             <span className="bn-customer-mark">✦</span>
             <div className="bn-customer-header-info">
-              <b>{selected ? selected.name : "Bubble Nest AI"}</b>
+              <b>{selected ? selected.name : "Rides AI AI"}</b>
               <small>{selected ? "Business-specific assistant" : "Discover businesses and start chatting"}</small>
             </div>
             {selected && (
@@ -314,7 +314,7 @@ function CustomerAssistantWidget() {
         className={`bn-customer-launcher ${open ? "is-open" : ""}`}
         onClick={() => setOpen((value) => !value)}
         aria-label={open ? "Close customer chatbot" : "Open customer chatbot"}
-        title="Chat with Bubble Nest AI"
+        title="Chat with Rides AI AI"
       >
         {open ? "×" : <><i>Agent</i></>}
       </button>
@@ -346,24 +346,18 @@ function AuthPage({ mode }) {
   }
 
   return <div className="bn-auth-layout">
-    <aside className="bn-auth-aside"><Brand /><div className="bn-auth-promo"><span className="bn-eyebrow">MEET YOUR BUSINESS ASSISTANT</span><h1>Less busywork.<br /><em>More possibility.</em></h1><p>One place to manage your business information and give customers a helpful AI experience.</p><div className="bn-auth-quote"><span>✦</span><p>“A better customer experience starts with a conversation.”</p></div></div><small className="bn-auth-foot">Bubble Nest · AI for every business</small></aside>
+    <aside className="bn-auth-aside"><Brand /><div className="bn-auth-promo"><span className="bn-eyebrow">MEET YOUR BUSINESS ASSISTANT</span><h1>Less busywork.<br /><em>More possibility.</em></h1><p>One place to manage your business information and give customers a helpful AI experience.</p><div className="bn-auth-quote"><span>✦</span><p>“A better customer experience starts with a conversation.”</p></div></div><small className="bn-auth-foot">Rides AI · AI for every business</small></aside>
     <main className="bn-auth-main"><button className="bn-back-link" onClick={() => navigate("")}>← Back to home</button>
       <form className="bn-auth-form" onSubmit={submit}><span className="bn-eyebrow">{signup ? "START YOUR WORKSPACE" : "WELCOME BACK"}</span>
-        <h2>{signup ? "Create your business" : "Log in to Bubble Nest"}</h2><p>{signup ? "Set up your workspace to launch your AI assistant." : "Enter your account details to continue."}</p>
+        <h2>{signup ? "Create your business" : "Log in to Rides AI"}</h2><p>{signup ? "Set up your workspace to launch your AI assistant." : "Enter your account details to continue."}</p>
         <ErrorMessage>{error}</ErrorMessage>
         {signup && <>
           <label>Business name<input required name="name" value={form.name} onChange={update} placeholder="e.g. The Little Studio" maxLength={100} /></label>
-          <label>Business category<select name="category" value={form.category} onChange={update}><option>Retail</option><option>Food & Drink</option><option>Services</option><option>Health</option><option>Education</option><option>Other</option></select></label>
-          <div className="bn-form-row"><label>Owner name<input name="owner" value={form.owner} onChange={update} placeholder="Your name" /></label><label>Phone<input name="phone" value={form.phone} onChange={update} placeholder="Phone number" /></label></div>
-          <label>Business email<input required type="email" name="email" value={form.email} onChange={update} placeholder="you@example.com" /></label>
-          <label>Website <span className="bn-optional">Optional</span><input name="website" value={form.website} onChange={update} placeholder="https://yourwebsite.com" /></label>
-          <label>Short description <span className="bn-optional">Optional</span><textarea name="description" value={form.description} onChange={update} rows={3} placeholder="What does your business offer?" /></label>
           <div className="bn-form-row"><label>Currency<select name="currency" value={form.currency} onChange={update}><option>PKR</option><option>USD</option><option>GBP</option><option>EUR</option><option>AED</option></select></label><label>Timezone<select name="timezone" value={form.timezone} onChange={update}><option>Asia/Karachi</option><option>Asia/Dubai</option><option>Europe/London</option><option>America/New_York</option><option>UTC</option></select></label></div>
         </>}
-        {!signup && <label>Email address<input required type="email" name="email" autoComplete="email" value={form.email} onChange={update} placeholder="you@example.com" /></label>}
-        <label>Password<input required type="password" name="password" autoComplete={signup ? "new-password" : "current-password"} minLength={signup ? 8 : undefined} value={form.password} onChange={update} placeholder={signup ? "At least 8 characters" : "Your password"} /></label>
+        {!signup &&           <label>Business name<input required name="name" value={form.name} onChange={update} placeholder="e.g. The Little Studio" maxLength={100} /></label>}
         <button className="bn-btn bn-btn-primary bn-btn-full bn-btn-lg" disabled={busy}>{busy ? "Please wait..." : signup ? "Create workspace →" : "Log in →"}</button>
-        <p className="bn-auth-switch">{signup ? "Already have an account?" : "New to Bubble Nest?"} <button type="button" onClick={() => navigate(signup ? "login" : "signup")}>{signup ? "Log in" : "Create a business"}</button></p>
+        <p className="bn-auth-switch">{signup ? "Already have an account?" : "New to Rides AI?"} <button type="button" onClick={() => navigate(signup ? "login" : "signup")}>{signup ? "Log in" : "Create a business"}</button></p>
       </form>
     </main>
   </div>;
@@ -863,7 +857,7 @@ function DashboardCallModal({ businessName, onClose, onActions, onTranscript }) 
   return <div className="bn-call-overlay" role="dialog" aria-label="Voice call">
     <div className="bn-call-card">
       <div className={`bn-call-avatar ${talking ? "is-talking" : ""} ${status === "live" && !talking ? "is-listening" : ""}`}>✦</div>
-      <h3>Bubble Nest AI</h3>
+      <h3>Rides AI AI</h3>
       <p className="bn-call-status">{label}</p>
       {status === "live" && <p className="bn-call-timer">{mmss}</p>}
       {chips.length > 0 && <div className="bn-call-chips">{chips.map((c, i) => <span key={i} className={`bn-dash-ai-chip ${c.ok ? "is-ok" : "is-fail"}`}>{c.ok ? "✓" : "✕"} {TOOL_LABELS[c.tool] || c.tool}</span>)}</div>}
@@ -881,7 +875,7 @@ function DashboardAssistant({ businessName, onActions }) {
   const [open, setOpen] = useState(false);
   const [callOpen, setCallOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: `Hi! I'm your Bubble Nest AI assistant for ${businessName}. I can find orders, assign them to employees, update status, reply to or email customers, and tell you how your business and team are performing.` },
+    { role: "assistant", content: `Hi! I'm your Rides AI AI assistant for ${businessName}. I can find orders, assign them to employees, update status, reply to or email customers, and tell you how your business and team are performing.` },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -959,10 +953,10 @@ function DashboardAssistant({ businessName, onActions }) {
   }
 
   return <>
-    {open && <section className="bn-dash-ai-panel" aria-label="Bubble Nest AI assistant">
+    {open && <section className="bn-dash-ai-panel" aria-label="Rides AI AI assistant">
       <header className="bn-dash-ai-head">
         <span className="bn-dash-ai-mark">✦</span>
-        <div className="bn-dash-ai-title"><b>Bubble Nest AI</b><small>Business assistant · Text & voice</small></div>
+        <div className="bn-dash-ai-title"><b>Rides AI AI</b><small>Business assistant · Text & voice</small></div>
         <button type="button" className="bn-call-start" onClick={() => setCallOpen(true)} title="Start a voice call" aria-label="Start voice call">📞</button>
         <button type="button" className="bn-dash-ai-close" onClick={() => setOpen(false)} aria-label="Close AI assistant">×</button>
       </header>
@@ -978,7 +972,7 @@ function DashboardAssistant({ businessName, onActions }) {
       </div>
       <div className="bn-dash-ai-messages" aria-live="polite">
         {messages.map((m, i) => <div key={`${i}-${m.role}`} className={`bn-dash-ai-message ${m.role === "user" ? "is-user" : "is-assistant"}`}>
-          <span>{m.role === "user" ? "YOU" : "BUBBLE NEST AI"}</span>
+          <span>{m.role === "user" ? "YOU" : "Rides AI AI"}</span>
           <p>{m.content}</p>
           {m.actions?.length > 0 && <div className="bn-dash-ai-actions">{m.actions.map((a, k) => <span key={k} className={`bn-dash-ai-chip ${a.ok ? "is-ok" : "is-fail"}`} title={a.result?.error || ""}>{a.ok ? "✓" : "✕"} {TOOL_LABELS[a.tool] || a.tool || "Action"}</span>)}</div>}
           {m.role === "assistant" && <button type="button" className="bn-dash-ai-speak" onClick={() => { if ("speechSynthesis" in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(m.content); u.lang = speechLanguage; window.speechSynthesis.speak(u); } }} title="Read this reply aloud">🔊 Listen</button>}
@@ -999,7 +993,7 @@ function DashboardAssistant({ businessName, onActions }) {
       </div>
       <form className="bn-dash-ai-composer" onSubmit={(e) => { e.preventDefault(); sendMessage(); }}>
         <button type="button" className={`bn-dash-ai-mic ${listening ? "is-listening" : ""}`} onClick={startListening} disabled={busy || listening} aria-label="Speak a message" title="Speak a message">{listening ? "●" : "🎙"}</button>
-        <input value={input} onChange={(e) => setInput(e.target.value)} maxLength={2000} placeholder="Ask about orders or customers…" aria-label="Message Bubble Nest AI" />
+        <input value={input} onChange={(e) => setInput(e.target.value)} maxLength={2000} placeholder="Ask about orders or customers…" aria-label="Message Rides AI AI" />
         <button type="submit" disabled={busy || !input.trim()} aria-label="Send message">↑</button>
       </form>
       <p className="bn-dash-ai-footnote">

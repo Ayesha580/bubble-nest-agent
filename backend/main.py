@@ -42,7 +42,7 @@ OWNER_STATUSES = STATUSES[2:]
 ACTIVE_SQL = "('Completed','Cancelled')"
 SOURCES = {"ai": "by dashboard AI", "auto": "by auto agent", "employee": "by employee"}
 
-app = FastAPI(title="Bubble Nest AI Business Agent")
+app = FastAPI(title="Rides AI Business Agent")
 app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 client = AsyncOpenAI(api_key=API_KEY) if API_KEY else None
 
