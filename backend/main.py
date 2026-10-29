@@ -51,7 +51,7 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 PG = engine.dialect.name == "postgresql"
 PK = "SERIAL PRIMARY KEY" if PG else "INTEGER PRIMARY KEY AUTOINCREMENT"
 SCHEMA = f"""
-CREATE TABLE IF NOT EXISTS businesses(id {PK}, widget_id TEXT UNIQUE NOT NULL, profile TEXT NOT NULL, agent TEXT NOT NULL, knowledge TEXT DEFAULT '', created DOUBLE PRECISION);
+CREATE TABLE IF NOT EXISTS businesses(id {PK}, widget_id TEXT UNIQUE NOT NULL, profile TEXT NOT NULL, agent TEXT NOT NULL, knowledge TEXT DEFAULT '', name_key TEXT, created DOUBLE PRECISION);
 CREATE TABLE IF NOT EXISTS users(id {PK}, biz INTEGER NOT NULL, email TEXT UNIQUE NOT NULL, salt TEXT NOT NULL, pw TEXT NOT NULL, created DOUBLE PRECISION);
 CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL, biz INTEGER NOT NULL, expires DOUBLE PRECISION NOT NULL);
 CREATE TABLE IF NOT EXISTS items(id {PK}, biz INTEGER NOT NULL, name TEXT NOT NULL, description TEXT DEFAULT '', category TEXT DEFAULT 'General', price DOUBLE PRECISION NOT NULL, available INTEGER DEFAULT 1, stock INTEGER, image TEXT DEFAULT '', created DOUBLE PRECISION);
@@ -76,7 +76,9 @@ with engine.begin() as _c:
             _c.execute(text(_s))
 
 # Migrations for databases created before these columns existed.
-for _sql in ("ALTER TABLE orders ADD COLUMN assigned_to INTEGER", "ALTER TABLE orders ADD COLUMN email TEXT DEFAULT ''"):
+for _sql in ("ALTER TABLE orders ADD COLUMN assigned_to INTEGER",
+             "ALTER TABLE orders ADD COLUMN email TEXT DEFAULT ''",
+             "ALTER TABLE businesses ADD COLUMN name_key TEXT"):
     try:
         with engine.begin() as _c:
             _c.execute(text(_sql))
@@ -103,6 +105,15 @@ def run(sql, **a):
     with engine.begin() as c:
         r = c.execute(text(sql), _norm(a))
         return r.scalar() if r.returns_rows else r.rowcount
+
+
+# Fill name_key for businesses created before name-only login existed.
+try:
+    for _b in q("SELECT id, profile FROM businesses WHERE name_key IS NULL"):
+        run("UPDATE businesses SET name_key=:k WHERE id=:i",
+            k=json.loads(_b["profile"]).get("name", "").strip().lower(), i=_b["id"])
+except Exception as _e:
+    print(f"name_key backfill skipped: {_e}")
 
 
 def ev(biz, kind, title, detail=""):
@@ -289,14 +300,12 @@ class Profile(BaseModel):
     support: str = Field(default="", max_length=200)
 
 
-class Signup(Profile):
-    email: str = Field(min_length=5, max_length=200)
-    password: str = Field(min_length=8, max_length=100)
+class Signup(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
 
 
 class Login(BaseModel):
-    email: str
-    password: str
+    name: str = Field(min_length=1, max_length=100)
 
 
 class ItemIn(BaseModel):
@@ -407,28 +416,33 @@ def health():
 
 @app.post("/auth/signup")
 def signup(body: Signup, request: Request):
+    """Name-only signup. Currency PKR and timezone Asia/Karachi come from Profile defaults."""
     limit(f"auth:{ip(request)}", 10, 60)
-    email = body.email.strip().lower()
-    if not EMAIL_RE.match(email):
-        raise HTTPException(400, "Enter a valid email address.")
-    if one("SELECT 1 AS x FROM users WHERE email=:e", e=email):
-        raise HTTPException(409, "This email already has an account. Please log in.")
-    profile = body.model_dump(exclude={"email", "password"})
-    profile["email"] = email
-    biz = run("INSERT INTO businesses(widget_id,profile,agent,created) VALUES(:w,:p,:a,:c) RETURNING id",
-              w="wg_" + secrets.token_hex(8), p=json.dumps(profile), a=json.dumps(AGENT_DEFAULT), c=time.time())
+    name = body.name.strip()
+    key = name.lower()
+    if not name:
+        raise HTTPException(400, "Enter your business name.")
+    if one("SELECT 1 AS x FROM businesses WHERE name_key=:k", k=key):
+        raise HTTPException(409, "This business name already exists. Please log in.")
+    profile = Profile(name=name).model_dump()
+    profile["email"] = ""
+    biz = run("INSERT INTO businesses(widget_id,profile,agent,name_key,created) VALUES(:w,:p,:a,:k,:c) RETURNING id",
+              w="wg_" + secrets.token_hex(8), p=json.dumps(profile), a=json.dumps(AGENT_DEFAULT), k=key, c=time.time())
     salt = secrets.token_hex(8)
-    uid = run("INSERT INTO users(biz,email,salt,pw,created) VALUES(:b,:e,:s,:p,:c) RETURNING id", b=biz, e=email, s=salt, p=hash_pw(body.password, salt), c=time.time())
-    audit(biz, "Workspace created", body.name)
+    uid = run("INSERT INTO users(biz,email,salt,pw,created) VALUES(:b,:e,:s,:p,:c) RETURNING id",
+              b=biz, e=f"biz{biz}@rides.local", s=salt, p=hash_pw(secrets.token_hex(16), salt), c=time.time())
+    audit(biz, "Workspace created", name)
     return {"token": new_session(uid, biz)}
 
 
 @app.post("/auth/login")
 def login(body: Login, request: Request):
+    """Name-only login (no password)."""
     limit(f"auth:{ip(request)}", 10, 60)
-    u = one("SELECT * FROM users WHERE email=:e", e=body.email.strip().lower())
-    if not u or not hmac.compare_digest(u["pw"], hash_pw(body.password, u["salt"])):
-        raise HTTPException(401, "Wrong email or password.")
+    b = one("SELECT id FROM businesses WHERE name_key=:k", k=body.name.strip().lower())
+    u = one("SELECT id,biz FROM users WHERE biz=:b ORDER BY id LIMIT 1", b=b["id"]) if b else None
+    if not u:
+        raise HTTPException(401, "No business found with this name.")
     return {"token": new_session(u["id"], u["biz"])}
 
 
@@ -829,7 +843,13 @@ def state(s=Depends(owner)):
 @app.put("/me/profile")
 def update_profile(body: Profile, s=Depends(owner)):
     biz = one("SELECT profile FROM businesses WHERE id=:b", b=s["biz"])
-    run("UPDATE businesses SET profile=:p WHERE id=:b", p=json.dumps({**json.loads(biz["profile"]), **body.model_dump()}), b=s["biz"])
+    new_name = body.name.strip()
+    key = new_name.lower()
+    clash = one("SELECT id FROM businesses WHERE name_key=:k AND id<>:b", k=key, b=s["biz"])
+    if clash:
+        raise HTTPException(409, "Another business already uses this name.")
+    run("UPDATE businesses SET profile=:p, name_key=:k WHERE id=:b",
+        p=json.dumps({**json.loads(biz["profile"]), **body.model_dump()}), k=key, b=s["biz"])
     audit(s["biz"], "Business profile updated")
     return {"ok": True}
 
