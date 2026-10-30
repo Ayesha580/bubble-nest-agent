@@ -4,6 +4,8 @@ import logo from "./assets/logo.webp";
 
 const API = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
 const TOKEN_KEY = "bn_token";
+// Maintenance band karne ke liye false kar dein
+const MAINTENANCE_MODE = true;
 const CURRENCY = (value, currency = "PKR") => {
   const n = Number(value || 0);
   try {
@@ -83,7 +85,7 @@ function Brand({ compact = false }) {
       aria-label="Rides AI home"
     >
       <img src={logo} alt="" className="bn-brand-logo" />
-      <span>Rides Ai</span>
+      <span>Rides AI</span>
     </button>
   );
 }
@@ -103,7 +105,63 @@ export default function App() {
     ? <Dashboard onLogout={() => { localStorage.removeItem(TOKEN_KEY); navigate("login"); }} />
     : <AuthPage mode="login" />;
   if (route.page === "store" || route.page === "embed") return <StorePage widgetId={route.widgetId} embedded={route.page === "embed"} />;
-  return <HomePage />;
+  return MAINTENANCE_MODE ? <MaintenancePage /> : <HomePage />;
+}
+
+function MaintenancePage() {
+  return (
+    <div className="bn-maint">
+      <div className="bn-maint-brand"><Brand /></div>
+
+      <div className="bn-maint-card">
+        <svg className="bn-maint-art" viewBox="0 0 400 300" role="img" aria-label="Site under maintenance illustration">
+          {/* background blob */}
+          <ellipse cx="200" cy="265" rx="140" ry="16" fill="#a523a5" opacity=".12" />
+          <circle cx="200" cy="140" r="115" fill="#a523a5" opacity=".08" />
+
+          {/* browser window */}
+          <rect x="70" y="60" width="260" height="170" rx="14" fill="#fff" stroke="#a523a5" strokeWidth="3" />
+          <path d="M70 74a14 14 0 0 1 14-14h232a14 14 0 0 1 14 14v18H70z" fill="#a523a5" />
+          <circle cx="90" cy="76" r="4" fill="#fff" />
+          <circle cx="104" cy="76" r="4" fill="#fff" opacity=".7" />
+          <circle cx="118" cy="76" r="4" fill="#fff" opacity=".4" />
+          <rect x="92" y="190" width="120" height="8" rx="4" fill="#a523a5" opacity=".18" />
+          <rect x="92" y="206" width="80" height="8" rx="4" fill="#a523a5" opacity=".18" />
+
+          {/* big gear */}
+          <g className="bn-maint-gear" style={{ transformOrigin: "200px 145px" }}>
+            <path
+              fill="#a523a5"
+              d="M200 105l8 0 4 12 10 4 11-6 6 6-6 11 4 10 12 4v8l-12 4-4 10 6 11-6 6-11-6-10 4-4 12h-8l-4-12-10-4-11 6-6-6 6-11-4-10-12-4v-8l12-4 4-10-6-11 6-6 11 6 10-4z"
+            />
+            <circle cx="200" cy="145" r="16" fill="#fff" />
+          </g>
+
+          {/* small gear */}
+          <g className="bn-maint-gear-rev" style={{ transformOrigin: "275px 105px" }}>
+            <circle cx="275" cy="105" r="17" fill="none" stroke="#d946d9" strokeWidth="9" strokeDasharray="6 5" />
+            <circle cx="275" cy="105" r="9" fill="#d946d9" />
+          </g>
+
+          {/* wrench */}
+          <g transform="rotate(35 300 215)">
+            <rect x="292" y="170" width="16" height="80" rx="8" fill="#6b1a6b" />
+            <path d="M282 150a18 18 0 1 1 36 0v22h-12v-10h-12v10h-12z" fill="#6b1a6b" />
+          </g>
+        </svg>
+
+        <span className="bn-eyebrow">WE’LL BE BACK SOON</span>
+        <h1>This site is <em>under maintenance</em></h1>
+        <p>
+          We’re making some improvements to give you a better experience.
+          Please check back in a little while. Thank you for your patience!
+        </p>
+
+      </div>
+
+      <small className="bn-maint-foot">© {new Date().getFullYear()} Rides AI</small>
+    </div>
+  );
 }
 
 function HomePage() {

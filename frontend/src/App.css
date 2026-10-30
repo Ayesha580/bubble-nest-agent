@@ -1508,14 +1508,13 @@ input,select,textarea { min-width: 0; }
   cursor: pointer;
   white-space: nowrap;
 }
-
 .bn-brand-logo {
-  width: 90px;
+  width: 70px;
   height: 70px;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 50%;
   flex-shrink: 0;
 }
-
 .bn-brand-compact {
   gap: 7px;
   font-size: 18px;
@@ -2015,3 +2014,58 @@ body {
 
 /* Employee "Delivered" button: clear disabled state */
 .bn-emp-task-row .bn-btn:disabled { opacity: .45; filter: grayscale(.3); }
+/* ---------- Maintenance page ---------- */
+.bn-maint {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 16px;
+  color: #2a0f2a;
+  text-align: center;
+}
+.bn-maint-brand { align-self: flex-start; }
+.bn-maint-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 36px 28px 40px;
+  animation: bn-maint-in 0.6s ease both;
+}
+.bn-maint-art {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  margin: 0 auto 12px;
+  display: block;
+}
+.bn-maint-card h1 {
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  line-height: 1.2;
+  margin: 10px 0 14px;
+}
+.bn-maint-card h1 em {
+  font-style: normal;
+  color: #a523a5;
+}
+.bn-maint-card p {
+  color: #5c4a5c;
+  line-height: 1.6;
+  margin: 0 auto 22px;
+  max-width: 440px;
+}
+.bn-maint-actions { display: flex; justify-content: center; gap: 12px; }
+.bn-maint-foot { color: #7a667a; }
+
+.bn-maint-gear { animation: bn-maint-spin 8s linear infinite; }
+.bn-maint-gear-rev { animation: bn-maint-spin 5s linear infinite reverse; }
+
+@keyframes bn-maint-spin { to { transform: rotate(360deg); } }
+@keyframes bn-maint-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bn-maint-gear, .bn-maint-gear-rev, .bn-maint-card { animation: none; }
+}
