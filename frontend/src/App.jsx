@@ -116,22 +116,22 @@ function MaintenancePage() {
       <div className="bn-maint-card">
         <svg className="bn-maint-art" viewBox="0 0 400 300" role="img" aria-label="Site under maintenance illustration">
           {/* background blob */}
-          <ellipse cx="200" cy="265" rx="140" ry="16" fill="#a523a5" opacity=".12" />
-          <circle cx="200" cy="140" r="115" fill="#a523a5" opacity=".08" />
+          <ellipse cx="200" cy="265" rx="140" ry="16" fill="#ff77ff" opacity=".12" />
+          <circle cx="200" cy="140" r="115" fill="#ff77ff" opacity=".08" />
 
           {/* browser window */}
-          <rect x="70" y="60" width="260" height="170" rx="14" fill="#fff" stroke="#a523a5" strokeWidth="3" />
-          <path d="M70 74a14 14 0 0 1 14-14h232a14 14 0 0 1 14 14v18H70z" fill="#a523a5" />
+          <rect x="70" y="60" width="260" height="170" rx="14" fill="#fff" stroke="#ff77ff" strokeWidth="3" />
+          <path d="M70 74a14 14 0 0 1 14-14h232a14 14 0 0 1 14 14v18H70z" fill="#ff77ff" />
           <circle cx="90" cy="76" r="4" fill="#fff" />
           <circle cx="104" cy="76" r="4" fill="#fff" opacity=".7" />
           <circle cx="118" cy="76" r="4" fill="#fff" opacity=".4" />
-          <rect x="92" y="190" width="120" height="8" rx="4" fill="#a523a5" opacity=".18" />
-          <rect x="92" y="206" width="80" height="8" rx="4" fill="#a523a5" opacity=".18" />
+          <rect x="92" y="190" width="120" height="8" rx="4" fill="#ff77ff" opacity=".18" />
+          <rect x="92" y="206" width="80" height="8" rx="4" fill="#ff77ff" opacity=".18" />
 
           {/* big gear */}
           <g className="bn-maint-gear" style={{ transformOrigin: "200px 145px" }}>
             <path
-              fill="#a523a5"
+              fill="#ff77ff"
               d="M200 105l8 0 4 12 10 4 11-6 6 6-6 11 4 10 12 4v8l-12 4-4 10 6 11-6 6-11-6-10 4-4 12h-8l-4-12-10-4-11 6-6-6 6-11-4-10-12-4v-8l12-4 4-10-6-11 6-6 11 6 10-4z"
             />
             <circle cx="200" cy="145" r="16" fill="#fff" />
@@ -145,8 +145,8 @@ function MaintenancePage() {
 
           {/* wrench */}
           <g transform="rotate(35 300 215)">
-            <rect x="292" y="170" width="16" height="80" rx="8" fill="#6b1a6b" />
-            <path d="M282 150a18 18 0 1 1 36 0v22h-12v-10h-12v10h-12z" fill="#6b1a6b" />
+            <rect x="292" y="170" width="16" height="80" rx="8" fill="#ff77ff" />
+            <path d="M282 150a18 18 0 1 1 36 0v22h-12v-10h-12v10h-12z" fill="#ff77ff" />
           </g>
         </svg>
 
@@ -497,7 +497,7 @@ function StorePage({ widgetId, embedded, floating = false, onBackToBusinesses })
   if (!config) return <div className={cls}><Loading label="Connecting to assistant..." /></div>;
 
   return (
-    <div className={cls} style={{ "--bn-brand": config.brand_color || "#a523a5" }}>
+    <div className={cls} style={{ "--bn-brand": config.brand_color || "#ff77ff" }}>
       <header className="bn-chat-header">
         <button type="button" className="bn-chat-back" onClick={goBack}>{onBackToBusinesses ? "←" : embedded ? "×" : "←"}</button>
         <div className="bn-chat-avatar">✦</div>
@@ -789,7 +789,7 @@ function Dashboard({ onLogout }) {
         {section === "AI agent" && agent && <form className="bn-settings-form" onSubmit={saveAgent}><section className="bn-panel"><div className="bn-panel-heading"><div><h2>AI agent</h2><p>Choose how your assistant talks and which actions it can perform.</p></div><label className="bn-toggle"><input type="checkbox" checked={agent.enabled} onChange={(e) => setAgent({ ...agent, enabled: e.target.checked })} /><span /><b>{agent.enabled ? "Enabled" : "Disabled"}</b></label></div>
           <div className="bn-form-grid"><label>Conversation tone<input value={agent.tone} maxLength={100} onChange={(e) => setAgent({ ...agent, tone: e.target.value })} /></label><label>Language<input value={agent.language} maxLength={60} onChange={(e) => setAgent({ ...agent, language: e.target.value })} /></label><label className="bn-field-wide">Welcome message<textarea rows={2} maxLength={300} value={agent.welcome} onChange={(e) => setAgent({ ...agent, welcome: e.target.value })} placeholder="Leave blank to use the default welcome." /></label><label className="bn-field-wide">Owner instructions<textarea rows={4} maxLength={2000} value={agent.instructions} onChange={(e) => setAgent({ ...agent, instructions: e.target.value })} placeholder="Policies, priorities, and guidance for your assistant." /></label></div>
           <h3 className="bn-subheading">Enabled actions</h3><div className="bn-checkbox-grid">{Object.entries({ orders: "Prepare customer orders", handoff: "Request human assistance", auto_process: "Auto-accept & assign new orders" }).map(([key, label]) => <label key={key} className="bn-checkbox-card"><input type="checkbox" checked={!!agent.tasks?.[key]} onChange={(e) => setAgent({ ...agent, tasks: { ...agent.tasks, [key]: e.target.checked } })} /><span><b>{label}</b><small>{key === "orders" ? "Prepare an order summary for customer confirmation." : key === "handoff" ? "Mark conversations that need a team member." : "As soon as a customer confirms, the AI accepts it and assigns the least busy employee."}</small></span></label>)}</div>
-          <div className="bn-form-grid"><label>Delivery fee ({currency})<input type="number" min="0" step="0.01" value={agent.delivery_fee} onChange={(e) => setAgent({ ...agent, delivery_fee: Number(e.target.value) })} /></label><label>Tax (%)<input type="number" min="0" max="100" step="0.01" value={agent.tax_percent} onChange={(e) => setAgent({ ...agent, tax_percent: Number(e.target.value) })} /></label><label>Brand color<input type="color" value={agent.brand_color || "#a523a5"} onChange={(e) => setAgent({ ...agent, brand_color: e.target.value })} /></label><label className="bn-checkbox-line"><input type="checkbox" checked={!!agent.voice} onChange={(e) => setAgent({ ...agent, voice: e.target.checked })} /> Enable voice option</label>
+          <div className="bn-form-grid"><label>Delivery fee ({currency})<input type="number" min="0" step="0.01" value={agent.delivery_fee} onChange={(e) => setAgent({ ...agent, delivery_fee: Number(e.target.value) })} /></label><label>Tax (%)<input type="number" min="0" max="100" step="0.01" value={agent.tax_percent} onChange={(e) => setAgent({ ...agent, tax_percent: Number(e.target.value) })} /></label><label>Brand color<input type="color" value={agent.brand_color || "#ff77ff"} onChange={(e) => setAgent({ ...agent, brand_color: e.target.value })} /></label><label className="bn-checkbox-line"><input type="checkbox" checked={!!agent.voice} onChange={(e) => setAgent({ ...agent, voice: e.target.checked })} /> Enable voice option</label>
             <label className="bn-field-wide">Fulfillment options <small className="bn-help">Choose all options you support.</small><div className="bn-chip-checks">{["Pickup", "Delivery", "Dine-in", "On-site", "Online"].map((f) => <label key={f}><input type="checkbox" checked={agent.fulfillment.includes(f)} onChange={(e) => setAgent({ ...agent, fulfillment: e.target.checked ? [...agent.fulfillment, f] : agent.fulfillment.filter((x) => x !== f) })} />{f}</label>)}</div></label>
             <label className="bn-field-wide">Suggested questions <small className="bn-help">One suggestion per line, up to 6.</small><textarea rows={4} value={(agent.suggestions || []).join("\n")} onChange={(e) => setAgent({ ...agent, suggestions: e.target.value.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 6) })} placeholder={"What do you offer?\nHow can I place an order?"} /></label>
             <label className="bn-field-wide">Allowed website domains <small className="bn-help">One domain per line. Leave empty to allow any embed origin.</small><textarea rows={3} value={(agent.domains || []).join("\n")} onChange={(e) => setAgent({ ...agent, domains: e.target.value.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 20) })} placeholder={"example.com\nshop.example.com"} /></label>
